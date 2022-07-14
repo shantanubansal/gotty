@@ -13,7 +13,7 @@ ENV GOPATH /usr/go
 RUN mkdir $GOPATH
 ENV PATH $GOPATH/bin:$PATH
 
-RUN go get github.com/shantanubansal/gotty
+RUN go install github.com/shantanubansal/gotty@master
 
 ENV TERM xterm
 
