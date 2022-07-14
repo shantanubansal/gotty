@@ -121,7 +121,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	info := client.User(nil, token)
 	var slave Slave
 	slave, err = server.factory.New(params)
-	cmdToRun := fmt.Sprintf("useradd %s -m -p %s\nsu -l %s\ncd /home/%s\nclear\necho %s > kubeconfigbase64\nbase64 --decode /path/to/file > kubeconfig\n export KUBECONFIG=/home/%s/kubeconfig\nexport PS1=$(whoami)$\nclear\n", info.UserName, info.UserName, info.UserName, info.UserName, info.KubeConfig, info.UserName)
+	cmdToRun := fmt.Sprintf("useradd %s -m -p %s\nsu -l %s\ncd /home/%s\nclear\necho %s > kubeconfigbase64\nbase64 --decode kubeconfigbase64 > kubeconfig\n export KUBECONFIG=/home/%s/kubeconfig\nexport PS1=$(whoami)$\nclear\n", info.UserName, info.UserName, info.UserName, info.UserName, info.KubeConfig, info.UserName)
 	fmt.Println("CMD: ", cmdToRun)
 	_, err = slave.Write([]byte(cmdToRun))
 	if err != nil {
