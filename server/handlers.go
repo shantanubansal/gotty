@@ -122,6 +122,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	var slave Slave
 	slave, err = server.factory.New(params)
 	cmdToRun := fmt.Sprintf("ls\nuseradd %s -m -p %s\ncd /home/%s\nclear\necho %s > kubeconfig\n export KUBECONFIG=/home/%s/kubeconfig\nclear\n", info.UserName, info.UserName, info.UserName, info.KubeConfig, info.UserName)
+	fmt.Println("CMD: ", cmdToRun)
 	_, err = slave.Write([]byte(cmdToRun))
 	if err != nil {
 		return errors.Wrapf(err, "failed to create backend")
