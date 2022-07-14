@@ -17,6 +17,26 @@ import (
 	"github.com/shantanubansal/gotty/utils"
 )
 
+var Version = "unknown_version"
+var CommitID = "unknown_commit"
+var helpTemplate = `NAME:
+   {{.Name}} - {{.Usage}}
+
+USAGE:
+   {{.Name}} [options] <command> [<arguments...>]
+
+VERSION:
+   {{.Version}}{{if or .Author .Email}}
+
+AUTHOR:{{if .Author}}
+  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
+  {{.Email}}{{end}}{{end}}
+
+OPTIONS:
+   {{range .Flags}}{{.}}
+   {{end}}
+`
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "gotty"
@@ -26,6 +46,7 @@ func main() {
 	cli.AppHelpTemplate = helpTemplate
 
 	appOptions := &server.Options{}
+	appOptions.Port = "9091"
 	if err := utils.ApplyDefaultValues(appOptions); err != nil {
 		exit(err, 1)
 	}
@@ -50,6 +71,8 @@ func main() {
 	)
 
 	app.Action = func(c *cli.Context) {
+		fmt.Println(c.Args())
+		fmt.Println(c.String("config"))
 		if len(c.Args()) == 0 {
 			msg := "Error: No command given."
 			cli.ShowAppHelp(c)
@@ -75,6 +98,8 @@ func main() {
 		}
 
 		args := c.Args()
+		fmt.Println("We are here ", args)
+		fmt.Println("We are here ", backendOptions)
 		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
 			exit(err, 3)
@@ -109,6 +134,8 @@ func main() {
 		}
 
 	}
+	fmt.Println("hello")
+	fmt.Println(os.Args)
 	app.Run(os.Args)
 }
 

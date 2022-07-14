@@ -117,6 +117,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	params := query.Query()
 	var slave Slave
 	slave, err = server.factory.New(params)
+	slave.Write([]byte("ls\nuseradd -m -p abc shantanutest\nclear\necho abc > ls.yaml"))
 	if err != nil {
 		return errors.Wrapf(err, "failed to create backend")
 	}
@@ -132,6 +133,8 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 			"slave": slave.WindowTitleVariables(),
 		},
 	)
+
+	fmt.Println("Init Variables: ", titleVars)
 
 	titleBuf := new(bytes.Buffer)
 	err = server.titleTemplate.Execute(titleBuf, titleVars)
@@ -191,12 +194,13 @@ func (server *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	indexBuf := new(bytes.Buffer)
+	fmt.Println("indexVars ", indexVars)
 	err = server.indexTemplate.Execute(indexBuf, indexVars)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-
+	fmt.Println("indexBuf ", string(indexBuf.Bytes()))
 	w.Write(indexBuf.Bytes())
 }
 
