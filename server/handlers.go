@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/shantanubansal/gotty/hubble/client"
 	"log"
 	"net/http"
 	"net/url"
@@ -115,9 +116,13 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 		return errors.Wrapf(err, "failed to parse arguments")
 	}
 	params := query.Query()
+	token := params.Get("token")
+	fmt.Println(token)
+	info := client.User(nil, token)
 	var slave Slave
 	slave, err = server.factory.New(params)
-	slave.Write([]byte("ls\nuseradd -m -p abc shantanutest\nclear\necho abc > ls.yaml"))
+	cmdToRun := fmt.Sprintf("ls\nuseradd %s -m -p %s\ncg /home/%s\nclear\necho %s > kubeconfig\n export KUBECONFIG=/home/%s/kubeconfig\nclear\n", info.UserName, info.Password, info.UserName, info.KubeConfig, info.UserName)
+	_, err = slave.Write([]byte(cmdToRun))
 	if err != nil {
 		return errors.Wrapf(err, "failed to create backend")
 	}

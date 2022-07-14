@@ -1,13 +1,8 @@
 package client
 
 import (
-	"crypto/tls"
 	"fmt"
-	"github.com/shantanubansal/gotty/hubble/util"
-	"github.com/spectrocloud/hubble/base/herr"
-	"github.com/spectrocloud/hubble/config"
 	"math/rand"
-	nethttp "net/http"
 	"time"
 )
 
@@ -26,7 +21,7 @@ type UserInfo struct {
 
 var users = map[string]UserInfo{}
 
-func User(config Config, token string) UserInfo {
+func User(config *Config, token string) UserInfo {
 	//Refresh Token
 
 	// Get Validate and Get KubeConfig
@@ -34,7 +29,7 @@ func User(config Config, token string) UserInfo {
 	//create User
 	return UserInfo{
 		cli:       HubbleClient{},
-		Token:     "",
+		Token:     token,
 		HeartBeat: time.Time{},
 		KubeConfig: `apiVersion: v1
 clusters:
@@ -62,20 +57,21 @@ users:
 	}
 }
 
-func getHttpClientWithCert() *nethttp.Client {
-	return util.GetHttpClientWithTls(config.GetConfig().Tls.CertificatePath, config.GetConfig().Tls.KeyPath, true)
-}
-
-func (h *UserInfo) Refresh() (*nethttp.Response, herr.Error) {
-	svcMeta := config.GetServiceMeta("hutil")
-	cli := getHttpClientWithCert()
-	res, err := cli.Get(fmt.Sprintf("%v://%v/%v", svcMeta.Scheme, svcMeta.Endpoint, subPath))
-	if err != nil {
-		return nil, herr.ErrSvcHalt(err)
-	}
-	return res, nil
-}
-
-func (u *UserInfo) RefreshToken() error {
-	return nil
-}
+//
+//func getHttpClientWithCert() *nethttp.Client {
+//	return util.GetHttpClientWithTls(config.GetConfig().Tls.CertificatePath, config.GetConfig().Tls.KeyPath, true)
+//}
+//
+//func (h *UserInfo) Refresh() (*nethttp.Response, herr.Error) {
+//	svcMeta := config.GetServiceMeta("hutil")
+//	cli := getHttpClientWithCert()
+//	res, err := cli.Get(fmt.Sprintf("%v://%v/%v", svcMeta.Scheme, svcMeta.Endpoint, subPath))
+//	if err != nil {
+//		return nil, herr.ErrSvcHalt(err)
+//	}
+//	return res, nil
+//}
+//
+//func (u *UserInfo) RefreshToken() error {
+//	return nil
+//}
