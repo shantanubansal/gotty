@@ -80,6 +80,12 @@ func (wt *WebTTY) Run(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
+				if string(buffer[:n]) == "exit" {
+					_, err := wt.slave.Write([]byte("exit"))
+					if err != nil {
+						return err
+					}
+				}
 			}
 		}()
 	}()
@@ -135,11 +141,9 @@ func (wt *WebTTY) sendInitializeMessage() error {
 }
 
 func (wt *WebTTY) handleSlaveReadEvent(data []byte) error {
-	if string(data) == "exit" {
-		data = []byte("exit\nexit")
-	}
 	fmt.Println("Slave Read Event ", string(data))
 	safeMessage := base64.StdEncoding.EncodeToString(data)
+
 	err := wt.masterWrite(append([]byte{Output}, []byte(safeMessage)...))
 	if err != nil {
 		return errors.Wrapf(err, "failed to send message to master")
@@ -169,7 +173,6 @@ func (wt *WebTTY) handleMasterReadEvent(data []byte) error {
 		if !wt.permitWrite {
 			return nil
 		}
-
 		if len(data) <= 1 {
 			return nil
 		}

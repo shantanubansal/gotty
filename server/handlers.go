@@ -128,7 +128,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 		"echo %s > /home/%s/kubeconfigbase64\n"+
 		"base64 --decode /home/%s/kubeconfigbase64 > /home/%s/kubeconfig\n"+
 		"export KUBECONFIG=/home/%s/kubeconfig\n"+
-		"export PS1=$(whoami)$\n"+
+		"export PS1=$(whoami)@\\w $\n"+
 		"clear\n",
 		info.UserName, info.UserName,
 		info.UserName,
