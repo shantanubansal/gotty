@@ -4,6 +4,12 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"github.com/NYTimes/gziphandler"
+	"github.com/elazarl/go-bindata-assetfs"
+	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
+	"github.com/shantanubansal/gotty/pkg/homedir"
+	"github.com/shantanubansal/gotty/webtty"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -12,14 +18,6 @@ import (
 	"regexp"
 	noesctmpl "text/template"
 	"time"
-
-	"github.com/NYTimes/gziphandler"
-	"github.com/elazarl/go-bindata-assetfs"
-	"github.com/gorilla/websocket"
-	"github.com/pkg/errors"
-
-	"github.com/shantanubansal/gotty/pkg/homedir"
-	"github.com/shantanubansal/gotty/webtty"
 )
 
 // Server provides a webtty HTTP endpoint.
