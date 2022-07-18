@@ -129,12 +129,12 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	cmdToRun := fmt.Sprintf(
 		"useradd %s -m -p %s\n"+
 			"su -l %s\n"+
+			"export PS1=$(whoami) $ \n"+
 			"cd /home/%s\n"+
 			"clear\n"+
 			"echo %s > /home/%s/kubeconfigbase64\n"+
 			"base64 --decode /home/%s/kubeconfigbase64 > /home/%s/kubeconfig\n"+
 			"export KUBECONFIG=/home/%s/kubeconfig\n"+
-			"export PS1=$(whoami) $ \n"+
 			"clear\n",
 		info.UserName, complicatedString,
 		info.UserName,

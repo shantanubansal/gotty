@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/shantanubansal/gotty/hubble/util"
@@ -53,7 +54,10 @@ func (u *UserInfo) getInfoFromHubble() (*UserInfo, error) {
 		return nil, err
 	}
 	u.UserName = userName
-	u.KubeConfig = kubeConfig
+	if kubeConfig == "" {
+		return nil, propertyCannotBeEmpty("KubeConfig")
+	}
+	u.KubeConfig = base64.StdEncoding.EncodeToString([]byte(kubeConfig))
 	return u, nil
 }
 
