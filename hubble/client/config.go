@@ -13,3 +13,13 @@ type TlsConfig struct {
 	Certificate    string
 	IsInsecure     bool
 }
+
+var config *Config
+
+func InitConfig(cnf *Config) {
+	config = cnf
+}
+
+func GetConfig() *Config {
+	return config
+}

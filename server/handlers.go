@@ -116,12 +116,26 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 		return errors.Wrapf(err, "failed to parse arguments")
 	}
 	params := query.Query()
-	token := params.Get("token")
-	fmt.Println(token)
-	info := client.User(nil, token)
+
+	fmt.Println("PARMAs", params)
+	info := client.User(params.Get("token"), params.Get("spectroClusterUid"), params.Get("userUid"))
 	var slave Slave
 	slave, err = server.factory.New(params)
-	cmdToRun := fmt.Sprintf("useradd %s -m -p %s\nsu -l %s\ncd /home/%s\nclear\necho %s > kubeconfigbase64\nbase64 --decode kubeconfigbase64 > kubeconfig\n export KUBECONFIG=/home/%s/kubeconfig\nexport PS1=$(whoami)$\nclear\n", info.UserName, info.UserName, info.UserName, info.UserName, info.KubeConfig, info.UserName)
+	cmdToRun := fmt.Sprintf("useradd %s -m -p %s\n"+
+		"su -l %s\n"+
+		"cd /home/%s\n"+
+		"clear\n"+
+		"echo %s > /home/%s/kubeconfigbase64\n"+
+		"base64 --decode /home/%s/kubeconfigbase64 > /home/%s/kubeconfig\n"+
+		"export KUBECONFIG=/home/%s/kubeconfig\n"+
+		"export PS1=$(whoami)$\n"+
+		"clear\n",
+		info.UserName, info.UserName,
+		info.UserName,
+		info.UserName,
+		info.KubeConfig, info.UserName,
+		info.UserName, info.UserName,
+		info.UserName)
 	fmt.Println("CMD: ", cmdToRun)
 	_, err = slave.Write([]byte(cmdToRun))
 	if err != nil {
@@ -139,8 +153,6 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 			"slave": slave.WindowTitleVariables(),
 		},
 	)
-
-	fmt.Println("Init Variables: ", titleVars)
 
 	titleBuf := new(bytes.Buffer)
 	err = server.titleTemplate.Execute(titleBuf, titleVars)
@@ -187,7 +199,6 @@ func (server *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 	)
-
 	titleBuf := new(bytes.Buffer)
 	err := server.titleTemplate.Execute(titleBuf, titleVars)
 	if err != nil {
@@ -200,13 +211,11 @@ func (server *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	indexBuf := new(bytes.Buffer)
-	fmt.Println("indexVars ", indexVars)
 	err = server.indexTemplate.Execute(indexBuf, indexVars)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-	fmt.Println("indexBuf ", string(indexBuf.Bytes()))
 	w.Write(indexBuf.Bytes())
 }
 

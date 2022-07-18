@@ -71,8 +71,6 @@ func main() {
 	)
 
 	app.Action = func(c *cli.Context) {
-		fmt.Println(c.Args())
-		fmt.Println(c.String("config"))
 		if len(c.Args()) == 0 {
 			msg := "Error: No command given."
 			cli.ShowAppHelp(c)
@@ -98,8 +96,6 @@ func main() {
 		}
 
 		args := c.Args()
-		fmt.Println("We are here ", args)
-		fmt.Println("We are here ", backendOptions)
 		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
 			exit(err, 3)
@@ -134,8 +130,6 @@ func main() {
 		}
 
 	}
-	fmt.Println("hello")
-	fmt.Println(os.Args)
 	app.Run(os.Args)
 }
 
@@ -162,12 +156,10 @@ func waitSignals(errs chan error, cancel context.CancelFunc, gracefullCancel con
 		switch s {
 		case syscall.SIGINT:
 			gracefullCancel()
-			fmt.Println("C-C to force close")
 			select {
 			case err := <-errs:
 				return err
 			case <-sigChan:
-				fmt.Println("Force closing...")
 				cancel()
 				return <-errs
 			}
