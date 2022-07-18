@@ -110,7 +110,7 @@ func GetHttpClientWithCert() *nethttp.Client {
 
 func (u *UserInfo) GetKubeConfig() (string, error) {
 	cli := GetHttpClientWithCert()
-	subPath := fmt.Sprintf("v1/spectroclusters/%s/assets/kubeconfig?Authorization=%v&ProjectUid=%s", u.ClusterUid, u.Token, "62947aa9097dd5c23b4af67c")
+	subPath := fmt.Sprintf("v1/spectroclusters/%s/assets/kubeconfig?Authorization=%v&ProjectUid=%s", u.ClusterUid, u.Token, u.ProjectUid)
 	res, err := cli.Get(fmt.Sprintf("https://%v/%v", u.cli.Endpoint, subPath))
 	if err != nil {
 		return "", err
