@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -20,7 +19,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/shantanubansal/gotty/pkg/homedir"
-	"github.com/shantanubansal/gotty/pkg/randomstring"
 	"github.com/shantanubansal/gotty/webtty"
 )
 
@@ -97,9 +95,9 @@ func (server *Server) Run(ctx context.Context, options ...RunOption) error {
 	counter := newCounter(time.Duration(server.options.Timeout) * time.Second)
 
 	path := "/"
-	if server.options.EnableRandomUrl {
-		path = "/" + randomstring.Generate(server.options.RandomUrlLength) + "/"
-	}
+	//if server.options.EnableRandomUrl {
+	path = "/" + "shelly" + "/"
+	//}
 
 	handlers := server.setupHandlers(cctx, cancel, path, counter)
 	srv, err := server.setupHTTPServer(handlers)
