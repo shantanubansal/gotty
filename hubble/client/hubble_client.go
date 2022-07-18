@@ -46,7 +46,7 @@ func (u *UserInfo) getInfoFromHubble() (*UserInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.User = user
+	u.User = *user
 	userName := fmt.Sprintf("%s-%s", u.User.Spec.FirstName, u.creationTime)
 	users[userName] = u
 	kubeConfig, err := u.GetKubeConfig()
