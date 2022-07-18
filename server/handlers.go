@@ -88,6 +88,8 @@ func (server *Server) generateHandleWS(ctx context.Context, cancel context.Cance
 	}
 }
 
+const complicatedString = "WjI5RVdXMUdkV015Um5OMFNHVnlSVmw2U205aFIwcDFWVzFvYVdKc1ZUbHBVdz09"
+
 func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) error {
 	typ, initLine, err := conn.ReadMessage()
 	if err != nil {
@@ -117,26 +119,29 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 	}
 	params := query.Query()
 
-	fmt.Println("PARMAs", params)
-	info := client.User(params.Get("token"), params.Get("spectroClusterUid"), params.Get("userUid"))
+	info, err := client.User(params)
+	if err != nil {
+		return err
+	}
+
 	var slave Slave
 	slave, err = server.factory.New(params)
-	cmdToRun := fmt.Sprintf("useradd %s -m -p %s\n"+
-		"su -l %s\n"+
-		"cd /home/%s\n"+
-		"clear\n"+
-		"echo %s > /home/%s/kubeconfigbase64\n"+
-		"base64 --decode /home/%s/kubeconfigbase64 > /home/%s/kubeconfig\n"+
-		"export KUBECONFIG=/home/%s/kubeconfig\n"+
-		"export PS1=$(whoami)@\\w $\n"+
-		"clear\n",
-		info.UserName, info.UserName,
+	cmdToRun := fmt.Sprintf(
+		"useradd %s -m -p %s\n"+
+			"su -l %s\n"+
+			"cd /home/%s\n"+
+			"clear\n"+
+			"echo %s > /home/%s/kubeconfigbase64\n"+
+			"base64 --decode /home/%s/kubeconfigbase64 > /home/%s/kubeconfig\n"+
+			"export KUBECONFIG=/home/%s/kubeconfig\n"+
+			"export PS1=$(whoami) $ \n"+
+			"clear\n",
+		info.UserName, complicatedString,
 		info.UserName,
 		info.UserName,
 		info.KubeConfig, info.UserName,
 		info.UserName, info.UserName,
 		info.UserName)
-	fmt.Println("CMD: ", cmdToRun)
 	_, err = slave.Write([]byte(cmdToRun))
 	if err != nil {
 		return errors.Wrapf(err, "failed to create backend")

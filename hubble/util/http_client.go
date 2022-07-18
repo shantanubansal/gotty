@@ -42,25 +42,6 @@ func NewClient(baseURL string) *Client {
 	}
 }
 
-func NewClientWithCerts(baseURL, certificatePath, key string, isInsecure bool) (*Client, error) {
-	if !strings.HasSuffix(baseURL, "/") {
-		baseURL += "/"
-	}
-	u, _ := url.Parse(baseURL)
-	tlsConfig, err := GetTlsConfig(certificatePath, key, isInsecure)
-	if err != nil {
-		return nil, err
-	}
-	return &Client{
-		baseURL: u,
-		client: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: tlsConfig,
-			},
-		},
-	}, nil
-}
-
 func NewBasicAuthClient(baseURL string, user, pwd string) *Client {
 	if !strings.HasSuffix(baseURL, "/") {
 		baseURL += "/"
