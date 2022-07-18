@@ -121,7 +121,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 
 	info, err := client.User(params)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to initialize kubectl")
 	}
 
 	var slave Slave

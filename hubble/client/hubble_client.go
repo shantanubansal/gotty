@@ -119,11 +119,14 @@ func (u *UserInfo) GetKubeConfig() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if err := u.unmarshallToError(respBody); err != nil {
+		return "", err
+	}
 	return string(respBody), nil
 }
 
-func (u *UserInfo) GetUserInfo() (V1UserMe, error) {
-	var respMap V1UserMe
+func (u *UserInfo) GetUserInfo() (*V1UserMe, error) {
+	var respMap *V1UserMe
 	cli := GetHttpClientWithCert()
 	subPath := fmt.Sprintf("v1/users/me?Authorization=%s", u.Token)
 	res, err := cli.Get(fmt.Sprintf("https://%v/%v", u.cli.Endpoint, subPath))
@@ -134,10 +137,24 @@ func (u *UserInfo) GetUserInfo() (V1UserMe, error) {
 	if err != nil {
 		return respMap, err
 	}
-
-	e := json.Unmarshal(respBody, &respMap)
+	if err := u.unmarshallToError(respBody); err != nil {
+		return nil, err
+	}
+	e := json.Unmarshal(respBody, respMap)
 	if e != nil {
-		return respMap, e
+		return nil, e
 	}
 	return respMap, nil
+}
+
+func (u *UserInfo) unmarshallToError(respBody []byte) error {
+	var respMap *V1Error
+	e := json.Unmarshal(respBody, respMap)
+	if e != nil {
+		return nil
+	}
+	if respMap.Code != "" {
+		return fmt.Errorf("%s: %s", respMap.Code, respMap.Message)
+	}
+	return nil
 }

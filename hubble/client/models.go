@@ -21,3 +21,10 @@ type V1ObjectMeta struct {
 	SelfLink        string            `json:"selfLink,omitempty"`
 	UID             string            `json:"uid,omitempty"`
 }
+
+type V1Error struct {
+	Code    string      `json:"code,omitempty"`
+	Details interface{} `json:"details,omitempty"`
+	Message string      `json:"message,omitempty"`
+	Ref     string      `json:"ref,omitempty"`
+}
